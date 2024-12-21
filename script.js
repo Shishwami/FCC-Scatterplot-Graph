@@ -40,7 +40,9 @@ fetch(url)
             .attr("r", 5)
             .attr("data-xvalue", d => d.Year)
             .attr("data-yvalue", d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60))
-            .style("fill", "blue")
+            .style("fill", d =>
+                d.Doping == "" ? "orange" : "blue"
+            )
             .on("mouseover", (event, d) => {
                 d3.select("#tooltip")
                     .style("visibility", "visible")
