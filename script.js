@@ -17,7 +17,7 @@ fetch(url)
             .range([margin.left, width - margin.right]);
 
         const yScale = d3.scaleTime()
-            .domain([d3.min(data, d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60)), d3.max(data, d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60))])
+            .domain([d3.max(data, d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60)), d3.min(data, d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60))])
             .range([height - margin.bottom, margin.top]);
 
         svg.append("g")
@@ -29,6 +29,28 @@ fetch(url)
             .attr("id", "y-axis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(d3.axisLeft(yScale).tickFormat(d3.timeFormat("%M:%S")));
+
+        svg.selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => xScale(new Date(d.Year, 0)))
+            .attr("cy", d => yScale(new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60)))
+            .attr("r", 5)
+            .attr("data-xvalue", d => d.Year)
+            .attr("data-yvalue", d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60))
+            .style("fill", "blue")
+            .on("mouseover", (event, d) => {
+                d3.select("#tooltip")
+                    .style("visibility", "visible")
+                    .attr("data-year", d.Year)
+                    .html(`Year: ${d.Year}<br>Time: ${d.Time}`);
+            })
+            .on("mouseout", () => {
+                d3.select("#tooltip").style("visibility", "hidden");
+            });
+
 
     })
     .catch(error => console.error('Error fetching data:', error));
