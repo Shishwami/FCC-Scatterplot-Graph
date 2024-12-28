@@ -3,10 +3,10 @@ const url = "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData
 fetch(url)
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        // console.log(data);
 
         const width = 800;
-        const height = 500;
+        const height = 600;
         const margin = { top: 50, right: 50, bottom: 50, left: 70 };
 
         const xRange = d3.extent(data, d => d.Year);
@@ -53,16 +53,62 @@ fetch(url)
             .attr("data-yvalue", d => new Date(0, 0, 0, 0, d.Seconds / 60, d.Seconds % 60))
             .style("fill", d => d.Doping == "" ? "orange" : "blue")
             .on("mouseover", (event, d) => {
+
+
+                const [x, y] = d3.pointer(event, svg.node());
+                const svgWidth = svg.node().getBoundingClientRect().width;
+
+                const isRightHalf = x > svgWidth / 2;
+                const tooltipOffsetX = isRightHalf ? -150 : 10;
+                const tooltipOffsetY = 10;
+
                 d3.select("#tooltip")
                     .style("visibility", "visible")
                     .attr("data-year", d.Year)
-                    .html(`Year: ${d.Year}<br>Time: ${d.Time}`)
-                    .style("left", `${event.pageX + 10}px`)
-                    .style("top", `${event.pageY + 10}px`);
+                    .html(`Year: ${d.Year}<br>Time: ${d.Time}  <br>${d.Doping}`);
 
+            })
+            .on("mousemove", (event) => {
+                const [x, y] = d3.pointer(event, svg.node());
+                const svgWidth = svg.node().getBoundingClientRect().width;
+
+                const isRightHalf = x > svgWidth / 2;
+                const tooltipOffsetX = isRightHalf ? -90 : 10;
+                const tooltipOffsetY = 10;
+
+                d3.select("#tooltip")
+                    .style("left", `${event.pageX + tooltipOffsetX}px`)
+                    .style("top", `${event.pageY + tooltipOffsetY}px`);
             })
             .on("mouseout", () => {
                 d3.select("#tooltip").style("visibility", "hidden");
             });
+
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", height - 10)
+            .attr("text-anchor", "middle")
+            .text("Year");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -height / 2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text("Time in Minutes");
+
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .attr("id", "title")
+            .text("Doping in Professional Bicycle Racing");
+
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 40)
+            .attr("text-anchor", "middle")
+            .attr("id", "subtitle")
+            .text("35 Fastest times up Alpe d'Huez");
     })
     .catch(error => console.error('Error fetching data:', error));
