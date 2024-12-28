@@ -64,7 +64,5 @@ fetch(url)
             .on("mouseout", () => {
                 d3.select("#tooltip").style("visibility", "hidden");
             });
-
-
     })
     .catch(error => console.error('Error fetching data:', error));
